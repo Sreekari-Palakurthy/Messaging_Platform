@@ -1,18 +1,15 @@
 from pydantic import BaseModel
-from typing import List, Optional
-from datetime import datetime
 
-class MessageBase(BaseModel):
-    content: str
+class UserBase(BaseModel):
+    username: str
+    email: str
+    phone_number:int
 
-class MessageCreate(MessageBase):
-    pass
+class UserCreate(UserBase):
+    hashed_password: str
 
-class Message(MessageBase):
+class User(UserBase):
     id: int
-    timestamp: datetime
-    thread_id: int
-    user_id: int
 
     class Config:
         orm_mode = True
@@ -20,28 +17,25 @@ class Message(MessageBase):
 class ThreadBase(BaseModel):
     title: str
 
-class ThreadCreate(ThreadBase):
-    pass
-
 class Thread(ThreadBase):
     id: int
-    owner_id: int
-    messages: List[Message] = []
 
     class Config:
         orm_mode = True
 
-class UserBase(BaseModel):
-    username: str
-    email: str
-    phone_no:int
+class MessageBase(BaseModel):
+    content: str
 
-class UserCreate(UserBase):
-    password: str
+class MessageCreate(MessageBase):
+    sender_id: int
+    receiver_id: int
+    thread_id: int
 
-class User(UserBase):
+class Message(MessageBase):
     id: int
-    threads: List[Thread] = []
+    sender_id: int
+    receiver_id: int
+    thread_id: int
 
     class Config:
         orm_mode = True

@@ -1,21 +1,12 @@
-from sqlalchemy import Column, Integer, String, create_engine
+# app/database.py
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = "sqlite:///./test.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
-Base = declarative_base()
-engine = create_engine(DATABASE_URL)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base.metadata.create_all(bind=engine)
-
-
-def get_db():
-    try:
-        db = SessionLocal
-        yield db
-    except:
-        print("Error while connecting DB")
-    finally:
-        db.close()
+Base = declarative_base()

@@ -1,16 +1,12 @@
-from databases import SessionLocal,engine
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
-import models
-import schemas
-
-models.Base.metadata.create_all(bind=engine)
+import crud, models, schemas, databases
 
 app = FastAPI()
 
+# Dependency
 def get_db():
-    db = SessionLocal()
+    db = databases.SessionLocal()
     try:
         yield db
     finally:
@@ -18,39 +14,34 @@ def get_db():
 
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = models.User(username=user.username, email=user.email,phone_no=user.phone_no)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+    db_user = crud.get_user_by_email(db, email=user.email)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    return crud.create_user(db=db, user=user)
+
+@app.get("/users/{user_id}", response_model=schemas.User)
+def read_user(user_id: int, db: Session = Depends(get_db)):
+    db_user = crud.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
-@app.get("/users/", response_model=List[schemas.User])
-def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    users = db.query(models.User).offset(skip).limit(limit).all()
-    return users
-
 @app.post("/threads/", response_model=schemas.Thread)
-def create_thread(thread: schemas.ThreadCreate, db: Session = Depends(get_db), user_id=int):
-    db_thread = models.Thread(**thread.dict(), owner_id=user_id)
-    db.add(db_thread)
-    db.commit()
-    db.refresh(db_thread)
+def create_thread(thread: schemas.ThreadBase, db: Session = Depends(get_db)):
+    return crud.create_thread(db=db, thread=thread)
+
+@app.get("/threads/{thread_id}", response_model=schemas.Thread)
+def read_thread(thread_id: int, db: Session = Depends(get_db)):
+    db_thread = crud.get_thread(db, thread_id=thread_id)
+    if db_thread is None:
+        raise HTTPException(status_code=404, detail="Thread not found")
     return db_thread
 
-@app.get("/threads/", response_model=List[schemas.Thread])
-def read_threads(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    threads = db.query(models.Thread).offset(skip).limit(limit).all()
-    return threads
-
 @app.post("/messages/", response_model=schemas.Message)
-def create_message(message: schemas.MessageCreate, db: Session = Depends(get_db), thread_id=int, user_id=int):
-    db_message = models.Message(**message.dict(), thread_id=thread_id, user_id=user_id)
-    db.add(db_message)
-    db.commit()
-    db.refresh(db_message)
-    return db_message
+def create_message(message: schemas.MessageCreate, db: Session = Depends(get_db)):
+    return crud.create_message(db=db, message=message)
 
-@app.get("/messages/", response_model=List[schemas.Message])
+@app.get("/messages/", response_model=list[schemas.Message])
 def read_messages(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    messages = db.query(models.Message).offset(skip).limit(limit).all()
+    messages = crud.get_messages(db, skip=skip, limit=limit)
     return messages
