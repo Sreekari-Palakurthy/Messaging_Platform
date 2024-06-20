@@ -4,7 +4,6 @@ import crud, models, schemas, databases
 
 app = FastAPI()
 
-# Dependency
 def get_db():
     db = databases.SessionLocal()
     try:
