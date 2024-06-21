@@ -18,7 +18,7 @@ class Thread(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
-    messages = relationship("Message", back_populates="thread")
+    
 
 class Message(Base):
     __tablename__ = "messages"
