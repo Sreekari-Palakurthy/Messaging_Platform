@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
-import models, schemas
+import models, schemas,crud
 
 def create_user(db: Session, user: schemas.UserCreate):
     hashed_password = user.hashed_password
-    db_user = models.User(username=user.username, email=user.email, hashed_passwordpassword=hashed_password, phone_number=user.phone_number)
+    db_user = models.User(username=user.username, email=user.email, hashed_password=user.hashed_password, phone_number=user.phone_number)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -13,6 +13,7 @@ def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
 
 def get_user_by_email(db: Session, email: str):
+    print(f"{email = }")
     return db.query(models.User).filter(models.User.email == email).first()
 
 def create_thread(db: Session, thread: schemas.ThreadBase):
@@ -34,3 +35,6 @@ def create_message(db: Session, message: schemas.MessageCreate):
 
 def get_messages(db: Session, skip: int = 0, limit: int = 10):
     return db.query(models.Message).offset(skip).limit(limit).all()
+
+def get_user_messages(db: Session, user_id: int):
+    return db.query(models.Message).filter(models.Message.sender_id == user_id).all()
