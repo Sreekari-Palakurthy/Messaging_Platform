@@ -1,7 +1,6 @@
-from datetime import datetime
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-import crud, models, schemas, databases
+import models, schemas, databases
 from typing import List
 
 
