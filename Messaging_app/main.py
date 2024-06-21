@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 import crud, models, schemas, databases
 from typing import List
 
+
 app = FastAPI()
 
 def get_db():
