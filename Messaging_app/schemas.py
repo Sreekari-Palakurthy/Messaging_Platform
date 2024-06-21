@@ -1,9 +1,10 @@
 from pydantic import BaseModel
+import datetime
+
 
 class UserBase(BaseModel):
     username: str
     email: str
-    phone_number:int
 
 class UserCreate(UserBase):
     hashed_password: str
@@ -18,23 +19,25 @@ class ThreadBase(BaseModel):
     title: str
 
 class Thread(ThreadBase):
+    creator_id: int
+
+class ThreadInDB(Thread):
     id: int
+    creator: User
+    messages: List["Message"]
 
     class Config:
         orm_mode = True
 
 class MessageBase(BaseModel):
     content: str
-
-class MessageCreate(MessageBase):
     sender_id: int
-    receiver_id: int
     thread_id: int
 
 class Message(MessageBase):
     id: int
-    sender_id: int
-    receiver_id: int
+    created_at: datetime
+    sender: User
     thread_id: int
 
     class Config:
