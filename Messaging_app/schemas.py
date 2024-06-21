@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-import datetime
+from models import DateTime 
 from typing import List
 
 
@@ -37,7 +37,7 @@ class MessageBase(BaseModel):
 
 class Message(MessageBase):
     id: int
-    created_at: datetime
+    created_at: DateTime
     sender: User
     thread_id: int
 

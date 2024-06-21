@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime
 from sqlalchemy.orm import relationship
 from databases import Base, engine
 
@@ -9,7 +9,7 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    phone_number = Column(String)  # New column for phone number
+    phone_number = Column(String)
     messages_sent = relationship("Message", foreign_keys="[Message.sender_id]", back_populates="sender")
     messages_received = relationship("Message", foreign_keys="[Message.receiver_id]", back_populates="receiver")
 
