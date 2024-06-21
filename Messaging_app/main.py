@@ -2,6 +2,8 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 import crud,schemas, databases,models
 from databases import SessionLocal, engine
+
+
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -46,12 +48,4 @@ def create_message(message: schemas.MessageCreate, db: Session = Depends(get_db)
 @app.get("/messages/", response_model=list[schemas.Message])
 def read_messages(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     messages = crud.get_messages(db, skip=skip, limit=limit)
-    return messages
-
-@app.get("/users/{user_id}/messages", response_model=list[schemas.Message])
-def read_user_messages(user_id: int, db: Session = Depends(get_db)):
-    user = crud.get_user(db, user_id=user_id)
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    messages = crud.get_user_messages(db, user_id=user_id)
     return messages
