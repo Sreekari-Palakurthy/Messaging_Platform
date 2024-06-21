@@ -3,7 +3,7 @@ import models, schemas
 
 def create_user(db: Session, user: schemas.UserCreate):
     hashed_password = user.hashed_password
-    db_user = models.User(username=user.username, email=user.email, hashed_password=hashed_password, phone_number=user.phone_number)
+    db_user = models.User(username=user.username, email=user.email, hashed_passwordpassword=hashed_password, phone_number=user.phone_number)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
